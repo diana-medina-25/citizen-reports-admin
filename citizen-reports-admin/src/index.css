@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+/* Fondo login: imagen de ciudad costera al atardecer, optimizada (cover + centro) */
+.login-bg {
+  position: relative;
+  background-color: #0f172a;
+  background-image: url("/login-bg.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Overlay sutil para mejorar contraste del contenido (sin tapar la imagen) */
+.login-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(15, 23, 42, 0.75) 0%,
+    rgba(15, 23, 42, 0.5) 50%,
+    rgba(2, 6, 23, 0.8) 100%
+  );
+  pointer-events: none;
+}
