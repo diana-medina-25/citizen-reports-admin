@@ -4,7 +4,8 @@ import { useQuery } from '@tanstack/react-query'
 import { fetchReports } from './api'
 import type { ReportStatus } from './types'
 
-const STATUS_OPTIONS: { value: ReportStatus; label: string }[] = [
+const STATUS_OPTIONS: { value: ReportStatus | ''; label: string }[] = [
+  { value: '', label: 'Todos' },
   { value: 'PENDING', label: 'Pendiente' },
   { value: 'VALIDATED', label: 'Validado' },
   { value: 'IN_PROGRESS', label: 'En progreso' },
@@ -27,12 +28,16 @@ function StatusBadge({ status }: { status: ReportStatus }) {
 }
 
 export function ReportsPage() {
-  const [status, setStatus] = useState<ReportStatus>('PENDING')
+  const [status, setStatus] = useState<ReportStatus | ''>('')
   const [titleSearch, setTitleSearch] = useState('')
 
   const { data: reports = [], isLoading, error } = useQuery({
     queryKey: ['reports', status, titleSearch],
-    queryFn: () => fetchReports({ status, ...(titleSearch.trim() && { title: titleSearch.trim() }) }),
+    queryFn: () =>
+      fetchReports({
+        ...(status && { status }),
+        ...(titleSearch.trim() && { title: titleSearch.trim() }),
+      }),
   })
 
   return (
@@ -92,11 +97,11 @@ export function ReportsPage() {
             </div>
             <div className="w-full sm:w-52">
               <label className="block text-sm font-medium text-slate-700 mb-1.5">Estado</label>
-              <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value as ReportStatus)}
-                className="w-full rounded-xl bg-slate-50 border border-slate-200 text-slate-800 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              >
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value as ReportStatus | '')}
+              className="w-full rounded-xl bg-slate-50 border border-slate-200 text-slate-800 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            >
                 {STATUS_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
                 ))}
