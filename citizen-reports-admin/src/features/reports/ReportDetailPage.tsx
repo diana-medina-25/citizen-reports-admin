@@ -50,7 +50,7 @@ export function ReportDetailPage() {
   })
 
   const addCommentMutation = useMutation({
-    mutationFn: (content: string) => addReportComment(id!, { content }),
+    mutationFn: (comment: string) => addReportComment(id!, { comment }),
     onSuccess: () => {
       setComment('')
       queryClient.invalidateQueries({ queryKey: ['report', id] })

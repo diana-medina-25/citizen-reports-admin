@@ -33,5 +33,5 @@ export type UpdateStatusBody = {
 }
 
 export type AddCommentBody = {
-  content: string
+  comment: string
 }
