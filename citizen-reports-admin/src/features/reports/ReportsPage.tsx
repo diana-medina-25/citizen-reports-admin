@@ -8,21 +8,28 @@ const STATUS_OPTIONS: { value: ReportStatus | ''; label: string }[] = [
   { value: '', label: 'Todos' },
   { value: 'PENDING', label: 'Pendiente' },
   { value: 'VALIDATED', label: 'Validado' },
-  { value: 'IN_PROGRESS', label: 'En progreso' },
-  { value: 'RESOLVED', label: 'Resuelto' },
+  { value: 'OBSERVED', label: 'Observado' },
+  { value: 'REJECTED', label: 'Rechazado' },
+  { value: 'IN_PROCESS', label: 'En proceso' },
+  { value: 'CANCELLED', label: 'Cancelado' },
+  { value: 'FINALIZED', label: 'Finalizado' },
 ]
 
 const STATUS_STYLES: Record<ReportStatus, string> = {
   PENDING: 'bg-amber-100 text-amber-800 border-amber-200',
   VALIDATED: 'bg-blue-100 text-blue-800 border-blue-200',
-  IN_PROGRESS: 'bg-indigo-100 text-indigo-800 border-indigo-200',
-  RESOLVED: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+  OBSERVED: 'bg-sky-100 text-sky-800 border-sky-200',
+  REJECTED: 'bg-red-100 text-red-800 border-red-200',
+  IN_PROCESS: 'bg-indigo-100 text-indigo-800 border-indigo-200',
+  CANCELLED: 'bg-slate-100 text-slate-700 border-slate-200',
+  FINALIZED: 'bg-emerald-100 text-emerald-800 border-emerald-200',
 }
 
 function StatusBadge({ status }: { status: ReportStatus }) {
+  const style = STATUS_STYLES[status] ?? 'bg-slate-100 text-slate-700 border-slate-200'
   return (
-    <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold border ${STATUS_STYLES[status]}`}>
-      {status.replace('_', ' ')}
+    <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold border ${style}`}>
+      {status.replace(/_/g, ' ')}
     </span>
   )
 }

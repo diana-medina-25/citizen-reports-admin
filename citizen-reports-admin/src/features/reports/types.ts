@@ -1,4 +1,11 @@
-export type ReportStatus = 'PENDING' | 'VALIDATED' | 'IN_PROGRESS' | 'RESOLVED'
+export type ReportStatus =
+  | 'PENDING'
+  | 'VALIDATED'
+  | 'OBSERVED'
+  | 'REJECTED'
+  | 'IN_PROCESS'
+  | 'CANCELLED'
+  | 'FINALIZED'
 
 export type Report = {
   id: string
