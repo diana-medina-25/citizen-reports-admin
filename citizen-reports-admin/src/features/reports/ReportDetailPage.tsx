@@ -89,11 +89,18 @@ export function ReportDetailPage() {
     )
   }
 
-  const imgSrc = report.imageUrl ?? report.imageBase64
-  const mapsUrl =
-    report.latitude != null && report.longitude != null
-      ? `https://www.google.com/maps?q=${report.latitude},${report.longitude}`
-      : null
+  const lat = report.latitude ?? ''
+  const lng = report.longitude ?? ''
+  const mapsUrl = lat !== '' && lng !== '' ? `https://www.google.com/maps?q=${lat},${lng}` : null
+
+  const imageSources: string[] = []
+  if (report.images?.length) {
+    report.images.forEach((img) => img.image_url && imageSources.push(img.image_url))
+  }
+  if (report.imageUrl) imageSources.push(report.imageUrl)
+  if (report.imageBase64) imageSources.push(report.imageBase64)
+
+  const historyEntries = report.history ?? []
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800">
@@ -123,12 +130,26 @@ export function ReportDetailPage() {
               <StatusBadge status={report.status} />
             </div>
             <h1 className="text-2xl font-bold text-slate-800 mb-3">{report.title}</h1>
-            <p className="text-slate-600 whitespace-pre-wrap leading-relaxed">{report.description}</p>
+            {report.description != null && report.description !== '' && (
+              <p className="text-slate-600 whitespace-pre-wrap leading-relaxed">{report.description}</p>
+            )}
+            {report.address && (
+              <p className="text-slate-600 mt-2">
+                <span className="font-medium text-slate-700">Dirección: </span>
+                {report.address}
+              </p>
+            )}
+            {report.reference && (
+              <p className="text-slate-600 mt-1">
+                <span className="font-medium text-slate-700">Referencia: </span>
+                {report.reference}
+              </p>
+            )}
 
-            {(report.latitude != null || report.longitude != null) && (
+            {(lat !== '' || lng !== '') && (
               <div className="mt-6 p-4 rounded-xl bg-slate-50 border border-slate-100">
-                <p className="text-sm font-medium text-slate-500 mb-1">Ubicación</p>
-                <p className="text-slate-700 text-sm">{report.latitude}, {report.longitude}</p>
+                <p className="text-sm font-medium text-slate-500 mb-1">Coordenadas</p>
+                <p className="text-slate-700 text-sm">{lat}, {lng}</p>
                 {mapsUrl && (
                   <a
                     href={mapsUrl}
@@ -145,14 +166,21 @@ export function ReportDetailPage() {
               </div>
             )}
 
-            {imgSrc && (
+            {imageSources.length > 0 && (
               <div className="mt-6">
-                <p className="text-sm font-medium text-slate-500 mb-2">Evidencia</p>
-                <img
-                  src={imgSrc}
-                  alt="Evidencia del reporte"
-                  className="rounded-xl border border-slate-200 max-w-full max-h-96 object-contain bg-slate-50"
-                />
+                <p className="text-sm font-medium text-slate-500 mb-2">
+                  Evidencia {imageSources.length > 1 ? `(${imageSources.length} fotos)` : ''}
+                </p>
+                <div className="flex flex-col gap-4">
+                  {imageSources.map((src, idx) => (
+                    <img
+                      key={idx}
+                      src={src}
+                      alt={`Evidencia ${idx + 1} del reporte`}
+                      className="rounded-xl border border-slate-200 max-w-full max-h-96 object-contain bg-slate-50"
+                    />
+                  ))}
+                </div>
               </div>
             )}
           </div>
@@ -180,7 +208,49 @@ export function ReportDetailPage() {
           </div>
         </div>
 
-        {/* Comentario */}
+        {/* Historial de cambios */}
+        {historyEntries.length > 0 && (
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <h2 className="text-lg font-semibold text-slate-800 mb-4">Historial de cambios</h2>
+            <div className="space-y-3 max-h-80 overflow-y-auto">
+              {[...historyEntries].reverse().map((entry) => (
+                <div
+                  key={entry.id}
+                  className="p-4 rounded-xl bg-slate-50 border border-slate-100 text-sm"
+                >
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
+                    {(entry.previous_status || entry.new_status) && (
+                      <span className="text-slate-600">
+                        {entry.previous_status != null ? (
+                          <>
+                            <StatusBadge status={entry.previous_status} />
+                            <span className="mx-1">→</span>
+                          </>
+                        ) : null}
+                        <StatusBadge status={entry.new_status} />
+                      </span>
+                    )}
+                    <span className="text-slate-400 text-xs">
+                      {entry.admin
+                        ? `${entry.admin.first_name} ${entry.admin.last_name}`
+                        : 'Sistema'}
+                    </span>
+                    <span className="text-slate-400 text-xs">
+                      {entry.created_at
+                        ? new Date(entry.created_at).toLocaleString('es')
+                        : ''}
+                    </span>
+                  </div>
+                  {entry.comment != null && entry.comment !== '' && (
+                    <p className="text-slate-700 mt-2 pl-2 border-l-2 border-indigo-200">{entry.comment}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Añadir comentario */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
           <h2 className="text-lg font-semibold text-slate-800 mb-4">Añadir comentario</h2>
           <div className="flex gap-3">
